@@ -1,0 +1,17 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Perceptron", "Perceptron\Perceptron.csproj", "{ED9406D9-5EF1-41D0-B66A-77F2BFD2DFA0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ED9406D9-5EF1-41D0-B66A-77F2BFD2DFA0}.Debug|x86.ActiveCfg = Debug|x86
+		{ED9406D9-5EF1-41D0-B66A-77F2BFD2DFA0}.Debug|x86.Build.0 = Debug|x86
+		{ED9406D9-5EF1-41D0-B66A-77F2BFD2DFA0}.Release|x86.ActiveCfg = Release|x86
+		{ED9406D9-5EF1-41D0-B66A-77F2BFD2DFA0}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+EndGlobal
