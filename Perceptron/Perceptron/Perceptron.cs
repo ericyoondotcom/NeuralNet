@@ -37,5 +37,10 @@ namespace Perceptron
             return new Perceptron(dendriteA, dendriteB);
         }
 
+        public override string ToString()
+        {
+            return dendriteA.ToString() + ", " + dendriteB.ToString();
+        }
+
     }
 }
