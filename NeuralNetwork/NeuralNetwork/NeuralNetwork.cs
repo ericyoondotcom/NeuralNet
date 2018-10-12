@@ -6,7 +6,8 @@ namespace NeuralNetwork
 
         public Layer[] Layers;
         Func<double, double> Activation;
-        
+        public double Fitness { get; set; }
+
         public NeuralNetwork(Func<double, double> activation, int inputs, params int[] neuronsCount){
             Activation = activation;
             Layers = new Layer[neuronsCount.Length];
@@ -39,14 +40,28 @@ namespace NeuralNetwork
                 foreach (var neuron in layer.Neurons)
                 {
                     if(randy.NextDouble() < rate){
-                        neuron.Bias += randy.NextDouble(-1, 1);
+                        neuron.Bias += randy.NextDouble(-1, 1) * Fitness;
                     }
 
                     for (int i = 0; i < neuron.Weights.Length; i++){
                         if(randy.NextDouble() < rate){
-                            neuron.Weights[i] += randy.NextDouble(-1, 1);
+                            neuron.Weights[i] += randy.NextDouble(-1, 1) * Fitness;
                         }
                     }
+                }
+            }
+        }
+
+        public void Crossover(NeuralNetwork other, Random randy)
+        {
+            for (int i = 0; i < Layers.Length; i++)
+            {
+                int greatWall = randy.Next(0, Layers[i].Neurons.Length);
+                bool primary = randy.Next(2) == 1;
+                for (int n = (primary ? greatWall : 0); n < (primary ? Layers[i].Neurons.Length : greatWall); n++)
+                {
+                    other.Layers[i].Neurons[n].Weights.CopyTo(Layers[i].Neurons[n].Weights, 0);
+                    Layers[i].Neurons[n].Bias = other.Layers[i].Neurons[n].Bias;
                 }
             }
         }
