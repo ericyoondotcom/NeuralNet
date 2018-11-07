@@ -14,11 +14,11 @@ namespace NeuralNetwork
         }
 
         public void Randomize(Random randy){
-            Bias = randy.NextDouble();
+            Bias = randy.NextDouble(-1, 1);
 
             for (int i = 0; i < Weights.Length; i++)
             {
-                Weights[i] = randy.NextDouble();
+                Weights[i] = randy.NextDouble(-1, 1);
             }
         }
 
