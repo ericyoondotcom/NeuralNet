@@ -1,52 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using dubble = System.Double;
 namespace NeuralNetwork
 {
     class MainClass
     {
 
-        static double Sigmoid(double x){
-            return 1 / (1 + Math.Pow(Math.E, -x));
-        }
 
-        static double BinaryStep(double x)
-        {
-            return x < 0 ? 0 : 1;
-        }
+
 
         static double MAE(NeuralNetwork net){
-            double[] expected = { 0, 1, 1, 0 };
-            double[] actual = new double[4];
 
-            actual[0] = net.Compute(new double[] { 0, 0 })[0];
-            actual[1] = net.Compute(new double[] { 0, 1 })[0];
-            actual[2] = net.Compute(new double[] { 1, 0 })[0];
-            actual[3] = net.Compute(new double[] { 1, 1 })[0];
             double error = 0;
-            for (int i = 0; i < 4; i++){
-                error += Math.Abs(expected[i] - actual[i]);
+            for (int i = 0; i < net.Tests.Length; i++){
+                error += Math.Abs(net.Tests[i].Item2 - net.Compute(net.Tests[i].Item1)[0]);
 
             }
-            error /= 4;
             return error;
 
         }
 
-        static void Evolve(NeuralNetwork[] population, Random randy){
+        static double Evolve(NeuralNetwork[] population, Random randy){
 
             foreach (var net in population)
             {
                 net.Fitness = MAE(net);
             }
             Array.Sort(population, (a, b) => a.Fitness.CompareTo(b.Fitness));
-            Console.WriteLine(population[0].Fitness);
+
+            //Console.WriteLine(population[0].Fitness);
             for (int i = 1; i < population.Length; i++)
             {
                 population[i].Mutate(0.30, randy);
             }
+            return population[0].Fitness;
         }
-        static void Crossover(NeuralNetwork[] population, Random randy)
+        static double Crossover(NeuralNetwork[] population, Random randy)
         {
 
             foreach (var net in population)
@@ -54,7 +43,10 @@ namespace NeuralNetwork
                 net.Fitness = MAE(net);
             }
             Array.Sort(population, (a, b) => a.Fitness.CompareTo(b.Fitness));
-            Console.WriteLine(population[0].Fitness);
+
+
+            //Console.WriteLine(population[0].Fitness);
+
             for (int i = (int)(population.Length * 0.05); i < population.Length * 0.6; i++)
             {
                 population[i].Crossover(population[randy.Next(0, (int)(population.Length * 0.05))], randy);
@@ -64,24 +56,41 @@ namespace NeuralNetwork
             {
                 population[i].Randomize(randy);
             }
+            return population[0].Fitness;
         }
 
         public static void Main(string[] args)
         {
             Random randy = new Random();//"shrek".GetHashCode());
 
-            NeuralNetwork[] population = new NeuralNetwork[1000];
+            NeuralNetwork[] evolvePop = new NeuralNetwork[1000];
+            NeuralNetwork[] crossoverPop = new NeuralNetwork[1000];
 
-            for (int i = 0; i < population.Length; i++){
-                population[i] = new NeuralNetwork(Sigmoid, 2, 2, 1);
-                population[i].Randomize(randy);
+            for (int i = 0; i < evolvePop.Length; i++){
+                evolvePop[i] = new NeuralNetwork(Activations.Sigmoid, 2, DataSets.XOR, 2, 1);
+                evolvePop[i].Randomize(randy);
+            }
+            for (int i = 0; i < crossoverPop.Length; i++)
+            {
+                crossoverPop[i] = new NeuralNetwork(Activations.Sigmoid, 2, DataSets.XOR, 2, 1);
+                crossoverPop[i].Randomize(randy);
             }
 
 
-            while(true){
+            while (true){
+            
+                double evolve = Evolve(evolvePop, randy);
+                double cross = Crossover(crossoverPop, randy);
 
-                //Evolve(population, randy);
-                Crossover(population, randy);
+                Console.WriteLine(evolve - cross);
+                if(evolve == 0){
+                    Console.WriteLine("Evolve wins!");
+                    break;
+                }
+                if(cross == 0){
+                    Console.WriteLine("Cross wins!");
+                    break;
+                }
 
 
             }

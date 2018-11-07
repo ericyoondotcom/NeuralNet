@@ -1,18 +1,21 @@
 ﻿using System;
+using dubble = System.Double;
 namespace NeuralNetwork
 {
     public class NeuralNetwork
     {
 
         public Layer[] Layers;
-        Func<double, double> Activation;
+        ActivationFunc Activation;
         public double Fitness { get; set; } = 1;
+        public (dubble[], dubble)[] Tests;
 
-        public NeuralNetwork(Func<double, double> activation, int inputs, params int[] neuronsCount){
+        public NeuralNetwork(ActivationFunc activation, int inputs, (dubble[], dubble)[] tests, params int[] neuronsCount){
+
             Activation = activation;
             Layers = new Layer[neuronsCount.Length];
             Layers[0] = new Layer(neuronsCount[0], inputs);
-        
+            Tests = tests;
             for (int i = 1; i < Layers.Length; i++){
                 Layers[i] = new Layer(neuronsCount[i], Layers[i - 1].Neurons.Length);
             }
@@ -27,9 +30,9 @@ namespace NeuralNetwork
         }
 
         public double[] Compute(double[] inputs){
-            Layers[0].Compute(inputs, Activation);
+            Layers[0].Compute(inputs, Activation.activation);
             for (int i = 1; i < Layers.Length; i++){
-                Layers[i].Compute(Layers[i - 1].Outputs, Activation);
+                Layers[i].Compute(Layers[i - 1].Outputs, Activation.activation);
             }
             return Layers[Layers.Length - 1].Outputs;
         }

@@ -22,7 +22,7 @@ namespace NeuralNetwork
             }
         }
 
-        public double[] Compute(double[] inputs, Func<double, double> activation){
+        public double[] Compute(double[] inputs, ActivationFunc.Activation activation){
             double[] outputs = new double[Neurons.Length];
             for (int i = 0; i < Neurons.Length; i++){
                 outputs[i] = Neurons[i].Compute(inputs, activation);

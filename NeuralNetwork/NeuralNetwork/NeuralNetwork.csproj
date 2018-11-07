@@ -38,6 +38,9 @@
     <Compile Include="Layer.cs" />
     <Compile Include="NeuralNetwork.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="ActivationFunc.cs" />
+    <Compile Include="Activations.cs" />
+    <Compile Include="DataSets.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

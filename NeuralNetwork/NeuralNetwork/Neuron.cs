@@ -6,6 +6,10 @@ namespace NeuralNetwork
         public double Bias;
         public double[] Weights;
         public double Output;
+        public double Delta;
+        public double BiasUpdate;
+        public double[] WeightUpdates;
+
 
         public Neuron(int inputs)
         {
@@ -22,7 +26,7 @@ namespace NeuralNetwork
             }
         }
 
-        public double Compute(double[] inputs, Func<double, double> activationfn){
+        public double Compute(double[] inputs, ActivationFunc.Activation activationfn){
             double output = 0;
             for (int i = 0; i < Weights.Length; i++)
             {
