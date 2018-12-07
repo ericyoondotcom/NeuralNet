@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using dubble = System.Double;
 namespace NeuralNetwork
 {
@@ -58,6 +59,63 @@ namespace NeuralNetwork
             }
             return population[0].Fitness;
         }
+
+        static double Backprop(NeuralNetwork net){
+        
+            foreach((dubble[], dubble) test in net.Tests){
+                double[] outputs = net.Compute(test.Item1);
+
+            }
+
+            return 0;
+        }
+
+        public void CalculateErrors((dubble[], dubble) test, NeuralNetwork net){
+            double expected = test.Item2;
+            for (int i = 0; i < net.OutputLayer.Neurons.Length; i++)
+            {
+                Neuron n = net.OutputLayer.Neurons[i];
+                double o = n.Output;
+
+                double error = expected - o;
+                net.OutputLayer.Neurons[i].PartialDerivative = error * net.Activation.derivative(o);
+            }
+
+
+            for (int i = net.Layers.Length - 2; i <= 0; i--){
+                Layer currLayer = net.Layers[i];
+                Layer nextLayer = net.Layers[i + 1];
+
+                for (int j = 0; j < currLayer.Neurons.Length; j++){
+                    Neuron currN = currLayer.Neurons[j];
+
+                    double error = 0;
+
+                    foreach(Neuron nextN in nextLayer.Neurons){
+                        error += nextN.PartialDerivative * nextN.Weights[j];
+                    }
+
+                    currN.PartialDerivative = error * net.Activation.derivative(currN.Output);
+                }
+            }
+
+        }
+        public void CalculateUpdates((dubble[], dubble) test, NeuralNetwork net, double learningRate){
+            dubble[] inputs = test.Item1;
+
+
+            for (int i = 0; i < net.InputLayer.Neurons.Length; i++){
+                Neuron n = net.InputLayer.Neurons[i];
+                for (int j = 0; j < n.Weights.Length; i++){
+                    n.WeightUpdates[j] = learningRate * n.PartialDerivative * inputs[j];
+                }
+                n.BiasUpdate += learningRate * n.PartialDerivative;
+            }
+
+            //TODO: Update stuff for hidden layers.
+
+        }
+
 
         public static void Main(string[] args)
         {

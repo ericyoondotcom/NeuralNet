@@ -6,7 +6,7 @@ namespace NeuralNetwork
         public double Bias;
         public double[] Weights;
         public double Output;
-        public double Delta;
+        public double PartialDerivative;
         public double BiasUpdate;
         public double[] WeightUpdates;
 

@@ -6,7 +6,7 @@ namespace NeuralNetwork
     {
 
         public Layer[] Layers;
-        ActivationFunc Activation;
+        public ActivationFunc Activation;
         public double Fitness { get; set; } = 1;
         public (dubble[], dubble)[] Tests;
 
@@ -20,6 +20,19 @@ namespace NeuralNetwork
                 Layers[i] = new Layer(neuronsCount[i], Layers[i - 1].Neurons.Length);
             }
 
+        }
+
+        public Layer OutputLayer {
+            get {
+                return Layers[Layers.Length - 1];
+            }
+        }
+        public Layer InputLayer
+        {
+            get
+            {
+                return Layers[0];
+            }
         }
 
         public void Randomize(Random randy){
