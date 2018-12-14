@@ -60,17 +60,33 @@ namespace NeuralNetwork
             return population[0].Fitness;
         }
 
-        static double Backprop(NeuralNetwork net){
-        
+        static double Backprop(NeuralNetwork net, dubble learningRate = 1){
+            Clear(net);
             foreach((dubble[], dubble) test in net.Tests){
-                double[] outputs = net.Compute(test.Item1);
-
+                net.Compute(test.Item1);
+                CalculateErrors(test, net);
+                CalculateUpdates(test, net, learningRate);
             }
+            ApplyUpdates(net);
 
-            return 0;
+            return MAE(net);
         }
 
-        public void CalculateErrors((dubble[], dubble) test, NeuralNetwork net){
+        static void Clear(NeuralNetwork net){
+            foreach(Layer l in net.Layers){
+                foreach(Neuron n in l.Neurons){
+                    n.BiasUpdate = 0;
+                    n.PartialDerivative = 0;
+
+                    for (int w = 0; w < n.WeightUpdates.Length; w++)
+                    {
+                        n.WeightUpdates[w] = 0;
+                    }
+                }
+            }
+        }
+
+        static public void CalculateErrors((dubble[], dubble) test, NeuralNetwork net){
             double expected = test.Item2;
             for (int i = 0; i < net.OutputLayer.Neurons.Length; i++)
             {
@@ -82,7 +98,7 @@ namespace NeuralNetwork
             }
 
 
-            for (int i = net.Layers.Length - 2; i <= 0; i--){
+            for (int i = net.Layers.Length - 2; i >= 0; i--){
                 Layer currLayer = net.Layers[i];
                 Layer nextLayer = net.Layers[i + 1];
 
@@ -100,20 +116,42 @@ namespace NeuralNetwork
             }
 
         }
-        public void CalculateUpdates((dubble[], dubble) test, NeuralNetwork net, double learningRate){
+        static public void CalculateUpdates((dubble[], dubble) test, NeuralNetwork net, double learningRate){
             dubble[] inputs = test.Item1;
 
 
             for (int i = 0; i < net.InputLayer.Neurons.Length; i++){
                 Neuron n = net.InputLayer.Neurons[i];
-                for (int j = 0; j < n.Weights.Length; i++){
-                    n.WeightUpdates[j] = learningRate * n.PartialDerivative * inputs[j];
+                for (int j = 0; j < n.Weights.Length; j++){
+                    n.WeightUpdates[j] += learningRate * n.PartialDerivative * inputs[j];
                 }
                 n.BiasUpdate += learningRate * n.PartialDerivative;
             }
 
-            //TODO: Update stuff for hidden layers.
+            for (int i = 1; i < net.Layers.Length; i++){
+                Layer currLayer = net.Layers[i];
+                Layer prevLayer = net.Layers[i - 1];
 
+                foreach(Neuron n in currLayer.Neurons){
+                    for (int w = 0; w < n.Weights.Length; w++){
+                        n.WeightUpdates[w] += learningRate * n.PartialDerivative * prevLayer.Outputs[w];
+                    }
+                    n.BiasUpdate += learningRate * n.PartialDerivative;
+                }
+            }
+
+        }
+
+        static void ApplyUpdates(NeuralNetwork net){
+            foreach(Layer l in net.Layers){
+                foreach(Neuron n in l.Neurons){
+                    for (int w = 0; w < n.Weights.Length; w++)
+                    {
+                        n.Weights[w] += n.WeightUpdates[w];
+                    }
+                    n.Bias += n.BiasUpdate;
+                }
+            }
         }
 
 
@@ -123,7 +161,8 @@ namespace NeuralNetwork
 
             NeuralNetwork[] evolvePop = new NeuralNetwork[1000];
             NeuralNetwork[] crossoverPop = new NeuralNetwork[1000];
-
+            NeuralNetwork backpropNet = new NeuralNetwork(Activations.Sigmoid, 2, DataSets.XOR, 2, 1);
+            backpropNet.Randomize(randy);
             for (int i = 0; i < evolvePop.Length; i++){
                 evolvePop[i] = new NeuralNetwork(Activations.Sigmoid, 2, DataSets.XOR, 2, 1);
                 evolvePop[i].Randomize(randy);
@@ -134,22 +173,27 @@ namespace NeuralNetwork
                 crossoverPop[i].Randomize(randy);
             }
 
-
+            Console.WriteLine("hi!");
             while (true){
-            
+
                 double evolve = Evolve(evolvePop, randy);
                 double cross = Crossover(crossoverPop, randy);
+                double backprop = Backprop(backpropNet);
 
-                Console.WriteLine(evolve - cross);
+                Console.SetCursorPosition(0, 0);
+                Console.WriteLine(evolve.ToString() + "\n" + cross.ToString() + "\n" + backprop.ToString());
                 if(evolve == 0){
                     Console.WriteLine("Evolve wins!");
-                    break;
+                    //break;
                 }
                 if(cross == 0){
                     Console.WriteLine("Cross wins!");
-                    break;
+                    //break;
                 }
-
+                if(backprop == 0){
+                    Console.WriteLine("Backprop wins!");
+                    //break;
+                }
 
             }
         }

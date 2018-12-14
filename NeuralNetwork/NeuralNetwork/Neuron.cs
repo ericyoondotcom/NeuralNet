@@ -14,7 +14,11 @@ namespace NeuralNetwork
         public Neuron(int inputs)
         {
             Weights = new double[inputs];
-         
+            Output = 0;
+            Bias = 0;
+            PartialDerivative = 0;
+            BiasUpdate = 0;
+            WeightUpdates = new double[inputs];
         }
 
         public void Randomize(Random randy){

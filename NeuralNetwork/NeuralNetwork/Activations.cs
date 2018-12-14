@@ -9,8 +9,7 @@ namespace NeuralNetwork
         }
 
         static double SigmoidDerivative(double x){
-            double activationResult = SigmoidActivation(x);
-            return activationResult * (1 - activationResult);
+            return x * (1 - x);
         }
 
         static double BinaryStepActivation(double x)
